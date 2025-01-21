@@ -1,0 +1,61 @@
+# Default values for foundry-vtt.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+
+## @section Image Parameters
+## @param image.pullPolicy pullPolicy for the Image
+## @param image.repository Repository to take the Image from
+## @param image.tag Image Tag
+image:
+  pullPolicy: IfNotPresent
+  repository: felddy/foundryvtt
+  tag: "12.324"
+
+
+## @section Persistence Storage Parameters
+## @param persistence.bind.enabled Enable bind mount for persistence storage
+## @param persistence.bind.hostpath Path in the host where to bind
+## @param persistence.storageClass: Storage Class to use when creating the Persistent Volume Claim
+## @param persistence.dataDir.enabled Enable the PVC
+## @param persistence.dataDir.size Size of the PVC
+## @param persistence.shared.enabled Enable tha shared mount for a NFS file system or a shared bind point with for sharing assets between multiple game instances when not using s3.
+## @param persistence.shared.mounts Shared mount points configurations for bind or pvc usage
+## - containerPath: is relative to the /data/Data
+##   type: bind or pvc
+##   hostpath: only used for bind mount
+##   readOnly: enable read only directories
+##   clainName: to be used mainly with NFS CSI PV/PVC
+persistence:
+  ## Foundry VTT data Persistent Volume Storage Class
+  ## Bind mount is mutually exclusive.
+  ## when storageClass for PV is enable this is automatically disabled
+  ## To use bind.enabled == true and dataDir.enabled == false
+  bind:
+    enabled: false
+    hostpath: /files
+
+  dataDir:
+    # Set this to false if you don't care to persist state between restarts.
+    enabled: true
+    size: 8Gi
+
+
+
+## @section Let's Encrypt configuration
+## @param letsEncrypt.enabled Enable the Let's Encrypt for Cert Manager
+## @param letsEncrypt.email
+## @param letsEncrypt.environment environment for Let's Encrypt it can be 'staging' or 'production'
+letsEncrypt:
+  enabled: true
+  email: maxdanelli@gmail.com
+  # ProTip: The production environment only allows you to register a name 5 times a week.
+  #         Use staging until you have your config right.
+  environment: staging
+
+
+## @section Certmanager Configuration
+## @param certmanager.version Certmanager version compatibility
+certmanager:
+  version: "v1.16.3"
+
