@@ -10,7 +10,7 @@
 image:
   pullPolicy: IfNotPresent
   repository: felddy/foundryvtt
-  tag: "12.324"
+  tag: "12.328"
 
 
 ## @section Persistence Storage Parameters
@@ -31,16 +31,54 @@ persistence:
   ## Bind mount is mutually exclusive.
   ## when storageClass for PV is enable this is automatically disabled
   ## To use bind.enabled == true and dataDir.enabled == false
-  bind:
-    enabled: false
-    hostpath: /files
-
+  storageClass: "local-path"
   dataDir:
     # Set this to false if you don't care to persist state between restarts.
     enabled: true
-    size: 8Gi
+    size: 5Gi
 
 
+service:
+  serviceType: LoadBalancer
+  port: 80
+  externalTrafficPolicy: ""
+
+
+## @section Ingress Parameters
+## @param ingress.class Chosse the type of Ingress controller
+## @param ingress.enabled Enable Ingress creations
+## @param ingress.hostname Hostname for FoundryVTT
+## @param ingress.annotations Ingress Annotations, useful for TLS
+## @param ingress.path FoundryVTT Path
+## @param ingress.pathType Type of Path
+## @param ingress.tls.enabled Enable or Disable TLS
+## @param ingress.tls.source the source of your signed certification, allowed {}, external, secret, or letsEncrypt
+## @param ingress.configurationSnippet Extra NGINX Configuration to add as Annotation
+ingress:
+  # options: nginx, contour
+  class: nginx
+  hostname: speggles.blafasel.com
+  enabled: true
+  path: "/"
+  pathType: Prefix
+  annotations:
+      kubernetes.io/ingress.class: traefik
+      cert-manager.io/cluster-issuer: letsencrypt-staging
+
+    ## E.g.
+    # nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
+    # nginx.ingress.kubernetes.io/proxy-read-timeout: "1800"
+    # nginx.ingress.kubernetes.io/proxy-send-timeout: "1800"
+
+  # configurationSnippet - Add additional Nginx configuration. This example statically sets a header on the ingress.
+  configurationSnippet: ""
+  ## E.g.
+  # configurationSnippet: |
+  #   more_set_input_headers "X-Forwarded-Host: {{ .Values.foundryvtt.hostname }}";
+  tls:
+    enabled: true
+    # {}, external, secret, or letsEncrypt
+    source: letsEncrypt
 
 ## @section Let's Encrypt configuration
 ## @param letsEncrypt.enabled Enable the Let's Encrypt for Cert Manager
